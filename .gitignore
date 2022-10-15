@@ -1,0 +1,4 @@
+.env
+node_modules/
+d3.v4.js
+dbrates.sqlite

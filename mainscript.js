@@ -38,7 +38,7 @@ alertMessage(5);
             ident_block = ident_block+1;
         };
     };
-    //NOTE: for some unknown reason when the algorithm ends testing identicality,
+
     exists = await dbExistanceChecker(`r${yesterdate}r`);
     if (exists == false){
         await createSeconDb();//Creating and filling database which concerns the rating of each show.
@@ -49,8 +49,10 @@ alertMessage(5);
     };
 
     exists = await dbExistanceChecker(`f${yesterdate}f`);
+    exists1 = await dbExistanceChecker(`r${yesterdate}r`);
+    exists2 = await dbExistanceChecker(`s${yesterdate}s`);
     if (ident_block <= 0){
-        if (exists == false){
+        if (exists == false && exists1 == true && exists2 == true){
             await dbCombiner();//Combines first and second database into a third one with showtimes and rating of each show at a given day.
             await dbOrganizer();//Deletes some extra columns as a side effect of INNER JOIN.
         };
@@ -64,6 +66,12 @@ alertMessage(5);
 
 //Server starter function (express)
 async function serverStarter(db){
+
+    exists = await dbExistanceChecker(db);
+    if (!exists){return new Promise((resolve,reject)=>{
+        alertMessage(10);
+        resolve();
+    })}
     var port = 3000;
     app.use(morgan('combined'));
     app.use(express.static('public'));
@@ -413,6 +421,9 @@ function alertMessage(statuscode,db){
         break;
         case 9: //generic error
         console.log('\x1b[31m%s\x1b]0m',`${detailedate} - An uknown error occured.\n`)
+        break;
+        case 10: //error: Probably didn't get a db yesterday, missing database
+        console.log('\x1b[31m%s\x1b]0m',`${detailedate} - Database is missing, probably because the script didn't get any information on the previous two days. WIll try again tommorow.\n`)
         break;
     };
     return;

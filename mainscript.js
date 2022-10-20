@@ -391,7 +391,7 @@ async function rowCounter(dbt,db){
 };
 //function that gets feeded with a statuscode and a name (probably a database most of the times) and returns a certain colored console.log with a message
 function alertMessage(statuscode,db){
-    let enabled = false;
+    let enabled = true;
     if (enabled == false){return;}
     var detailedate = new Date(Date.now()).toLocaleString();
     switch (statuscode){

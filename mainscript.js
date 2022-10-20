@@ -30,8 +30,8 @@ alertMessage(5);
 (async () =>{
     //BUG: the identical function somehow breaks the script's processing without any evidence or error
     let ident_block = 0;//ident_block changes value each time an identical table is found if it's any other number than 0, then it prevents the final database to be created.
-   exists =  await dbExistanceChecker(`s${todate}s`);
-    if (exists == false){
+   exists1 =  await dbExistanceChecker(`s${todate}s`);
+    if (exists1 == false){
         await createFirstDb();//Creating and filling database which concerns the showtime of each show.
         identical = await identicalChecker(`s${todate}s`,`s${yesterdate}s`);
         if (identical == true){
@@ -39,8 +39,8 @@ alertMessage(5);
         };
     };
 
-    exists = await dbExistanceChecker(`r${yesterdate}r`);
-    if (exists == false){
+    exists2 = await dbExistanceChecker(`r${yesterdate}r`);
+    if (exists2 == false){
         await createSeconDb();//Creating and filling database which concerns the rating of each show.
         identical = await identicalChecker(`r${yesterdate}r`,`r${twodaysagodate}r`);
         if (identical == true){
@@ -48,18 +48,16 @@ alertMessage(5);
        };
     };
 
-    exists = await dbExistanceChecker(`f${yesterdate}f`);
-    exists1 = await dbExistanceChecker(`r${yesterdate}r`);
-    exists2 = await dbExistanceChecker(`s${yesterdate}s`);
+    exists3 = await dbExistanceChecker(`f${yesterdate}f`);
     if (ident_block <= 0){
-        if (exists == false && exists1 == true && exists2 == true){
+        if (exists3 == false && exists1 == false && exists2 == false){
             await dbCombiner();//Combines first and second database into a third one with showtimes and rating of each show at a given day.
             await dbOrganizer();//Deletes some extra columns as a side effect of INNER JOIN.
         };
     };
-    if (exists == true){
+    if (exists3 == true){
         await serverStarter(`f${yesterdate}f`);//Starts up a server for displaying the grouped chart bar.
-    }else if (exists == false){
+    }else if (exists3 == false){
         await serverStarter(`f${twodaysagodate}f`); 
     }
 })(); 
@@ -281,52 +279,54 @@ async function jsonmaker(dbname){
             let oldshowname;
             let oldstartinghour;
             rows.forEach(function(row){
-                let convertedrate = row.sum_rating.replace(",",".")
-                convertedrate = convertedrate.replace("%","")
-                let startinghour =  row.startinghour.replace(":","")
-                if (startinghour >= 0500 && startinghour <=0600){
+                let convertedrate = row.sum_rating.replace(",",".");
+                convertedrate = convertedrate.replace("%","");
+                let startinghour =  row.startinghour.replace(":","");
+                startinghour = parseInt(startinghour);
+                if       (startinghour >= 500 && startinghour <=600){
                     startinghour = "5:00 - 6:00";
-                    }else if (startinghour >= 0601 && startinghour <=0700){
-                        startinghour = "6:00 - 7:00";
-                    }else if (startinghour >= 0701 && startinghour <=0800){
-                        startinghour = "7:00 - 8:00";
-                    }else if (startinghour >= 0801 && startinghour <=0900){
-                        startinghour = "8:00 - 9:00";
-                    }else if (startinghour >= 0901 && startinghour <=1000){
-                        startinghour = "9:00 - 10:00";
-                    }else if (startinghour >= 1001 && startinghour <=1100){
-                        startinghour = "10:00 - 11:00";
-                    }else if (startinghour >= 1101 && startinghour <=1200){
-                        startinghour = "11:00 - 12:00";
-                    }else if (startinghour >= 1201 && startinghour <=1300){
-                        startinghour = "12:00 - 13:00";
-                    }else if (startinghour >= 1301 && startinghour <=1400){
-                        startinghour = "13:00 - 14:00";
-                    }else if (startinghour >= 1401 && startinghour <=1500){
-                        startinghour = "14:00 - 15:00";
-                    }else if (startinghour >= 1501 && startinghour <=1600){
-                        startinghour = "15:00 - 16:00";
-                    }else if (startinghour >= 1601 && startinghour <=1700){
-                        startinghour = "16:00 - 17:00";
-                    }else if (startinghour >= 1701 && startinghour <=1800){
-                        startinghour = "17:00 - 18:00";
-                    }else if (startinghour >= 1801 && startinghour <=1900){
-                        startinghour = "18:00 - 19:00";
-                    }else if (startinghour >= 1901 && startinghour <=2000){
-                        startinghour = "19:00 - 20:00";
-                    }else if (startinghour >= 2001 && startinghour <=2100){
-                        startinghour = "20:00 - 21:00";
-                    }else if (startinghour >= 2101 && startinghour <=2200){
-                        startinghour = "21:00 - 22:00";
-                    }else if (startinghour >= 2201 && startinghour <=2300){
-                        startinghour = "22:00 - 23:00";
-                    }else if (startinghour >= 2301 && startinghour <=2359){
-                        startinghour = "23:00 - 00:00";
-                    }else(startinghour = "23:00 - 00:00");  
+                }else if (startinghour >= 601 && startinghour <=700){
+                    startinghour = "6:00 - 7:00";
+                }else if (startinghour >= 701 && startinghour <=800){
+                    startinghour = "7:00 - 8:00";
+                }else if (startinghour >= 801 && startinghour <=0900){
+                    startinghour = "8:00 - 9:00";
+                }else if (startinghour >= 901 && startinghour <=1000){
+                    startinghour = "9:00 - 10:00";
+                }else if (startinghour >= 1001 && startinghour <=1100){
+                    startinghour = "10:00 - 11:00";
+                }else if (startinghour >= 1101 && startinghour <=1200){
+                    startinghour = "11:00 - 12:00";
+                }else if (startinghour >= 1201 && startinghour <=1300){
+                    startinghour = "12:00 - 13:00";
+                }else if (startinghour >= 1301 && startinghour <=1400){
+                    startinghour = "13:00 - 14:00";
+                }else if (startinghour >= 1401 && startinghour <=1500){
+                    startinghour = "14:00 - 15:00";
+                }else if (startinghour >= 1501 && startinghour <=1600){
+                    startinghour = "15:00 - 16:00";
+                }else if (startinghour >= 1601 && startinghour <=1700){
+                    startinghour = "16:00 - 17:00";
+                }else if (startinghour >= 1701 && startinghour <=1800){
+                    startinghour = "17:00 - 18:00";
+                }else if (startinghour >= 1801 && startinghour <=1900){
+                    startinghour = "18:00 - 19:00";
+                }else if (startinghour >= 1901 && startinghour <=2000){
+                    startinghour = "19:00 - 20:00";
+                }else if (startinghour >= 2001 && startinghour <=2100){
+                    startinghour = "20:00 - 21:00";
+                }else if (startinghour >= 2101 && startinghour <=2200){
+                    startinghour = "21:00 - 22:00";
+                }else if (startinghour >= 2201 && startinghour <=2300){
+                    startinghour = "22:00 - 23:00";
+                }else if (startinghour >= 2301 && startinghour <=2359){
+                    startinghour = "23:00 - 00:00";
+                }else(startinghour = "23:00 - 00:00");  
 
                 if (oldchannelname == row.channel  && oldshowname == row.show && oldstartinghour == startinghour){return;};
                 jsontable.push({"channel": row.channel,"showname": row.show,"Startinghour":startinghour,"rate":  convertedrate});
                 oldchannelname = row.channel;oldshowname = row.show;oldstartinghour = startinghour;
+                console.log(startinghour);
             });
         });
         db.close();
@@ -391,7 +391,7 @@ async function rowCounter(dbt,db){
 };
 //function that gets feeded with a statuscode and a name (probably a database most of the times) and returns a certain colored console.log with a message
 function alertMessage(statuscode,db){
-    let enabled = true;
+    let enabled = false;
     if (enabled == false){return;}
     var detailedate = new Date(Date.now()).toLocaleString();
     switch (statuscode){

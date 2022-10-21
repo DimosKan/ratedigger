@@ -8,7 +8,7 @@ const morgan = require('morgan');
 const express = require('express');
 const { engine } = require('express-handlebars');
 const app = express();
-
+//Note bug: After a while when a request happens, the program slows down but when the request ends, the program is repeating whatever it does in 6 seconds
 //Date converter to mmddyy just to name databases
 var yesterdate = new Date();
 yesterdate.setDate(yesterdate.getDate() - 1);
@@ -28,7 +28,6 @@ alertMessage(5);
 //1)It checks if the Db title already exists.(dbExistanceChecker) and if it does, it skips everything that has to do with that database (create,filling)
 //2)It checks if today's db is identical by 30 rows with yesterday's. That will prevent duplicate tables with different dates if the owner of the site hasn't updated the table at the moment the algorithm checks.
 (async () =>{
-    //BUG: the identical function somehow breaks the script's processing without any evidence or error
     let ident_block = 0;//ident_block changes value each time an identical table is found if it's any other number than 0, then it prevents the final database to be created.
    exists1 =  await dbExistanceChecker(`s${todate}s`);
     if (exists1 == false){
@@ -81,7 +80,7 @@ async function serverStarter(db){
     });
     let json_obj = await jsonmaker(db);
     app.get('/api/data', (req, res) => {
-        res.json(json_obj); //displays data as json  
+        res.json(json_obj); //displays data as json 
     });
     app.get('/api/altdata', (req, res) => {
         res.csv(json_obj); //downloads data as csv
@@ -326,8 +325,9 @@ async function jsonmaker(dbname){
                 if (oldchannelname == row.channel  && oldshowname == row.show && oldstartinghour == startinghour){return;};
                 jsontable.push({"channel": row.channel,"showname": row.show,"Startinghour":startinghour,"rate":  convertedrate});
                 oldchannelname = row.channel;oldshowname = row.show;oldstartinghour = startinghour;
-                console.log(startinghour);
+                
             });
+            //console.log(jsontable)
         });
         db.close();
         resolve(jsontable);
@@ -389,9 +389,10 @@ async function rowCounter(dbt,db){
         });
     });
 };
+
 //function that gets feeded with a statuscode and a name (probably a database most of the times) and returns a certain colored console.log with a message
 function alertMessage(statuscode,db){
-    let enabled = true;
+    let enabled = false;
     if (enabled == false){return;}
     var detailedate = new Date(Date.now()).toLocaleString();
     switch (statuscode){

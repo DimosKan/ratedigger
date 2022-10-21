@@ -29,6 +29,7 @@ var svg = d3.select("#my_dataviz")
 d3.json("/api/data", function(data) {
     //data.columns = [...new Set(data.map(d => d.channel))];
     
+
     for(let d of data){
         if(d.showname.includes("ΣΑΒΒΑΤΟΚΥΡΙΑΚΟ")){
             d.channel = d.channel + "-ΣΑΒΒΑΤΟΚΥΡΙΑΚΟ";
@@ -100,6 +101,7 @@ d3.json("/api/data", function(data) {
 
     // Show the bars
     svg.append("g")
+    
         .selectAll("g")
         // Enter in data = loop group per group
         .data(outData2)
@@ -111,9 +113,29 @@ d3.json("/api/data", function(data) {
         .enter().append("rect")
         .attr("x", function (d) { return xSubgroup(d.key); })
         .attr("y", function (d) { return y(d.value); })
+        .attr("id", "tooltip")
         .attr("width", xSubgroup.bandwidth())
         .attr("height", function (d) { return height - y(d.value); })
         .attr("fill", function (d) { return color(d.key); });
 
-    })
+        var tool2 = d3.select("#my_dataviz")
+        .append("svg")
+            .attr("width", 10)
+            .attr("height", 10)
+
+    //for (let i = 0;i<10;i++){
+        var tooltip = d3.select("#my_dataviz")
+        .append("div")
+            .style("position", "absolute")
+            .style("visibility", "hidden")
+            .text(`${data[0].showname} (${data[0].channel}): ${data[0].rate}%`)
+    //}
+
+
+        d3.selectAll("#tooltip")
+        .on("mouseover", function(){return tooltip.style("visibility", "visible");})
+        .on("mousemove", function(){return tooltip.style("top", (event.pageY-50)+"px").style("left",(event.pageX-50)+"px");})
+        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+})
 </script>
+

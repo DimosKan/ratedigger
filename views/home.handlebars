@@ -71,6 +71,12 @@ d3.json("/api/data", function(data) {
     // List of groups = species here = value of the first column called group -> I show them on the X axis
     var groups = d3.map(outData2, function (d) { return (d.group) }).keys();
 
+        var tooltip = d3.select("#my_dataviz")
+        .append("div")
+            .style("position", "absolute")
+            .style("visibility", "hidden")
+            //.text("PLACEHOLDER")
+
     // Add X axis
     var x = d3.scaleBand()
         .domain(groups)
@@ -96,9 +102,8 @@ d3.json("/api/data", function(data) {
     // color palette = one color per subgroup
     var color = d3.scaleOrdinal()
         .domain(subgroups)
-        //.range(['#e41a1c','#377eb8','#4daf4a','#3daf3a','#1daf1a','#2faf4a','e11a3c', '#e41a1c', '#377eb8', '#4daf4a', '#3daf3a', '#1daf1a', '#2faf4a', 'e11a3c'])
         .range(['#99249f', '#88e5c7', '#c4f517', '#f5b417', '#ff7b04', '#ff048d', '#f994cb', '#b371da', '#9288ff', '#88baff', '#5aabc6', '#5ac69a', '#5c060d', '#b156bf'])
-
+    console.log(outData2);
     // Show the bars
     svg.append("g")
     
@@ -109,33 +114,27 @@ d3.json("/api/data", function(data) {
         .append("g")
         .attr("transform", function (d) { return "translate(" + x(d.group) + ",0)"; })
         .selectAll("rect")
-        .data(function (d) { return subgroups.map(function (key) { return { key: key, value: d[key] }; }); })
+        .data(function (d) { return subgroups.map(function (key) { return { key: key, value: d[key], obj: d }; }); })
         .enter().append("rect")
         .attr("x", function (d) { return xSubgroup(d.key); })
         .attr("y", function (d) { return y(d.value); })
         .attr("id", "tooltip")
         .attr("width", xSubgroup.bandwidth())
         .attr("height", function (d) { return height - y(d.value); })
-        .attr("fill", function (d) { return color(d.key); });
+        .attr("fill", function (d) { return color(d.key); })
+        .on("mouseover", function(d){tooltip.style("visibility", "visible");tooltip.html(`${d.key}: <span>[${d.value}]</span>`).style('left', `${d3.event.layerX}px`).style('top', `${(d3.event.layerY - 28)}px`);})
+       .on("mousemove", function(d){tooltip.style("top", (event.pageY-50)+"px").style("left",(event.pageX-50)+"px");})
+       .on("mouseout", function(d){ tooltip.style("visibility", "hidden");});
 
         var tool2 = d3.select("#my_dataviz")
         .append("svg")
             .attr("width", 10)
             .attr("height", 10)
 
-    //for (let i = 0;i<10;i++){
-        var tooltip = d3.select("#my_dataviz")
-        .append("div")
-            .style("position", "absolute")
-            .style("visibility", "hidden")
-            .text(`${data[0].showname} (${data[0].channel}): ${data[0].rate}%`)
-    //}
-
-
-        d3.selectAll("#tooltip")
-        .on("mouseover", function(){return tooltip.style("visibility", "visible");})
-        .on("mousemove", function(){return tooltip.style("top", (event.pageY-50)+"px").style("left",(event.pageX-50)+"px");})
-        .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+//           console.log(d);
+//            console.log(outData2.filter(it => {
+//                it[d.key] == d.value || it[`"${d.key}"`] == d.value
+//            }));
 })
 </script>
 

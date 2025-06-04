@@ -28,7 +28,7 @@
     "json-2-csv": "^3.17.2",
     "morgan": "^1.10.0",
     "pretty": "^2.0.0",
-    "puppeteer": "^15.5.0",
+    "puppeteer": "^24.10.0",
     "request-promise": "^4.2.6",
     "sqlite3": "^5.1.2"
   }
